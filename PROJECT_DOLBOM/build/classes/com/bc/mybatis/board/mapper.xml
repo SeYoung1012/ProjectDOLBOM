@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="dolbom">
+	<!-- 시터게시판 삽입 -->
+	<insert id="sitInsert" parameterType="com.bc.model.vo.board.SitterboardVO">
+		INSERT INTO SITTERBOARD
+	        	(SB_ID, SB_TITLE, SB_JOB, CARE_DATE, SB_CONTENT, FILE_NAME, 
+	        	ORI_NAME, SB_DATE, SB_HIT, USERID)
+		VALUES (SITTERBOARD_SEQ.NEXTVAL, #{sb_title}, #{sb_job}, #{care_date}, #{sb_content}, 
+				#{file_name}, #{ori_name}, SYSDATE, 0, #{userId})
+	</insert>
+	
+	<!-- 시터 검색   -->
+	<select id="searchSitterList" resultType="com.bc.model.vo.board.SitterboardVO">
+		
+        SELECT S.SB_ID, S.SB_JOB, M.NAME, M.ADDRESS, M.BIRTH, M.PAY, 
+				S.SB_TITLE, S.SB_CONTENT, S.FILE_NAME, S.ORI_NAME, S.SB_DATE,
+				S.SB_HIT, M.TYP
+		FROM MEMBER M, SITTERBOARD S
+		WHERE M.USERID = S.USERID AND M.ADDRESS LIKE '%'||#{search}||'%'
+		ORDER BY S.SB_DATE DESC
+	</select>
+	
+	
+	<!-- 시터게시판(시터찾기) 리스트 전체 출력 -->
+	<select id="sitterListAll" resultType="com.bc.model.vo.board.SitterboardVO">
+		SELECT *
+		  FROM(
+		     SELECT ROWNUM R_NUM, B.*
+		      FROM(
+		         SELECT S.SB_ID, S.SB_JOB, M.NAME, M.ADDRESS, M.BIRTH, M.PAY, 
+						S.SB_TITLE, S.SB_CONTENT, S.FILE_NAME, S.ORI_NAME, S.SB_DATE,
+						S.SB_HIT, M.TYP
+				FROM MEMBER M, SITTERBOARD S
+				WHERE M.USERID = S.USERID
+				ORDER BY S.SB_DATE DESC
+		         )B
+		     ) BOARD
+		 WHERE R_NUM BETWEEN #{begin} AND #{end} 
+	</select>
+	
+	<select id="sitterTotalCount" resultType="int">
+		SELECT COUNT(*) AS CNT
+		FROM SITTERBOARD
+	</select>
+	
+	<!-- 시터 상세보기 -->
+	<select id="sitterDetail" resultType="com.bc.model.vo.board.SitterboardVO">
+		SELECT M.*, S.* 
+		FROM MEMBER M, SITTERBOARD S
+		WHERE M.USERID = S.USERID AND SB_ID = #{sb_id}
+	</select>
+	
+	<!-- 시터게시글 삭제 -->
+	
+	<delete id="sitterDelete" parameterType="int">
+		DELETE  FROM SITTERBOARD
+		WHERE SB_ID = #{sb_id}
+	</delete>
+		<!-- 시터게시글 수정 -->
+	<update id="sitterUpdate" parameterType="com.bc.model.vo.board.SitterboardVO">
+		UPDATE SITTERBOARD
+		SET SB_TITLE = #{sb_title}, SB_JOB = #{sb_job}, SB_CONTENT = #{sb_content},
+			CARE_DATE = #{care_date}, SB_DATE = SYSDATE
+		WHERE SB_ID = #{sb_id}
+	</update>
+	 
+	
+	
+	
+	
+	 <!-- 맘게시판(일자리 찾기) 리스트 전체 출력 -->
+	 <select id="momListAll" resultType="com.bc.model.vo.board.MomboardVO">
+		SELECT *
+		  FROM(
+		     SELECT ROWNUM R_NUM, B.*
+		      FROM(
+		         SELECT M2.MB_ID, M2.MB_TITLE, M2.MB_CONTENT, M2.MB_DATE, M2.MB_HIT,
+						M2.CARE_DATE, M.USERID, M.NAME, M.ADDRESS, M.PAY, M.CHILD_AGE, M.CARE
+				FROM MEMBER M, MOMBOARD M2
+				WHERE M.USERID = M2.USERID
+				ORDER BY M2.MB_DATE DESC
+		         )B
+		     ) BOARD
+		 WHERE R_NUM BETWEEN #{begin} AND #{end} 
+	</select>
+	 
+	 <!-- 맘게시판 게시글 수 -->
+	 <select id="momTotalCount" resultType="int">
+		SELECT COUNT(*) AS CNT
+		FROM MOMBOARD
+	</select>
+	 
+	 <!-- 맘게시판(일자리 찾기) 상세보기 -->
+	<select id="momDetail" resultType="com.bc.model.vo.board.MomboardVO">
+		SELECT M.*, M2.* 
+		FROM MEMBER M, MOMBOARD M2
+		WHERE M.USERID = M2.USERID AND MB_ID = #{mb_id}
+	</select>	 
+	 
+	 <!-- 맘게시판 글쓰기 -->
+	 <insert id="momInsert" parameterType="com.bc.model.vo.board.MomboardVO">
+		INSERT INTO MomBOARD
+	        	(MB_ID, MB_TITLE, CARE_DATE, MB_CONTENT, MB_DATE, MB_HIT, USERID)
+		VALUES (MOMBOARD_SEQ.NEXTVAL, #{mb_title}, #{care_date}, #{mb_content}, 
+				 SYSDATE, 0, #{userId})
+	</insert>
+	 
+	 
+	 <!-- 맘 게시글 삭제 -->
+	 <delete id="momDelete" parameterType="int">
+		DELETE  FROM MOMBOARD
+		WHERE MB_ID = #{mb_id}
+	</delete>
+	
+	<!-- 맘 검색   -->
+	<select id="searchMomList" resultType="com.bc.model.vo.board.MomboardVO">
+		SELECT M2.MB_ID, M2.MB_TITLE, M2.MB_CONTENT, M2.MB_DATE, M2.MB_HIT,
+				M2.CARE_DATE, M.USERID, M.NAME, M.ADDRESS, M.PAY, M.CHILD_AGE, M.CARE
+		FROM MEMBER M, MOMBOARD M2
+		WHERE M.USERID = M2.USERID AND M.ADDRESS LIKE '%'||#{search}||'%'
+		ORDER BY M2.MB_DATE DESC
+	</select>
+	
+	<!-- 맘 게시글 수정 -->
+	<update id="momUpdate" parameterType="com.bc.model.vo.board.MomboardVO">
+		UPDATE MOMBOARD
+		SET MB_TITLE = #{mb_title}, MB_CONTENT = #{mb_content},
+			CARE_DATE = #{care_date}, MB_DATE = SYSDATE
+		WHERE MB_ID = #{mb_id}
+	</update>
+	
+	
+	
+	
+	<!-- 회원정보 리스트 출력 -->
+	<select id="loginUser" resultType="com.bc.model.vo.board.MemberVO">
+		SELECT *
+		FROM MEMBER
+		WHERE USERID = #{userId}
+	</select>
+	
+	<select id="login" parameterType="map" resultType="com.bc.model.vo.board.MemberVO">
+		SELECT * FROM MEMBER WHERE USERID=#{userId} AND PWD=#{pwd}
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
