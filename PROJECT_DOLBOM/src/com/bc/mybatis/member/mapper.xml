@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="member">
+	<!-- 로그인 -->
+	<select id="login" parameterType="map" resultType="MemberVO">
+	SELECT USERID, TYP, PWD, PWD2, NAME, PHONE, BIRTH, ADDRESS, EMAILID, EMAILBOX, CHILD_AGE AS CHILDAGE, CARE, PAY 
+	FROM MEMBER WHERE USERID=#{userId} AND PWD=#{pwd}
+	</select>
+	
+	<!-- 아이디 찾기 -->
+	<select id="idCheck" parameterType="map" resultType="MemberVO">
+	SELECT USERID, TYP, PWD, PWD2, NAME, PHONE, BIRTH, ADDRESS, EMAILID, EMAILBOX, CHILD_AGE AS CHILDAGE, CARE, PAY
+	 FROM MEMBER WHERE NAME=#{name} AND EMAILID=#{emailId} AND EMAILBOX=#{emailBox}
+	</select>
+	
+	<!-- 비밀번호 찾기 -->
+	<select id="pwdCheck" parameterType="map" resultType="MemberVO">
+	SELECT USERID, TYP, PWD, PWD2, NAME, PHONE, BIRTH, ADDRESS, EMAILID, EMAILBOX, CHILD_AGE AS CHILDAGE, CARE, PAY
+	 FROM MEMBER WHERE USERID=#{userId} AND EMAILID=#{emailId} AND EMAILBOX=#{emailBox}
+	</select>
+
+	<!-- 회원가입 -->
+	<insert id="join" parameterType="MemberVO">
+	INSERT INTO MEMBER (USERID, TYP, PWD, PWD2, NAME, PHONE, BIRTH, ADDRESS, EMAILID, EMAILBOX, CHILD_AGE, CARE, PAY)
+	VALUES (#{userId}, #{typ}, #{pwd}, #{pwd2}, #{name}, #{phone}, #{birth}, #{address}, #{emailId}, #{emailBox}, #{childAge}, #{care}, #{pay})
+	</insert>
+	
+	<!-- 아이디 중복체크 -->
+	<select id="idValidate" resultType="int" parameterType="string">
+	SELECT COUNT(*) FROM MEMBER WHERE USERID = #{userId} 
+   </select>
+	
+	<!-- 마이페이지 (내정보 조회) -->
+	<select id="view" parameterType="string" resultType="MemberVO">
+	SELECT USERID, TYP, PWD, PWD2, NAME, PHONE, BIRTH, ADDRESS, EMAILID, EMAILBOX, CHILD_AGE AS CHILDAGE, CARE, PAY
+	 FROM MEMBER WHERE USERID= #{userId}
+	</select>
+	
+	<!-- 회원정보 수정 -->
+	<update id="update" parameterType="MemberVO" >
+	UPDATE MEMBER
+	SET USERID = #{userId},
+		TYP = #{typ},
+		PWD = #{pwd},
+		PWD2 = #{pwd2},
+		NAME = #{name},
+	    PHONE = #{phone},
+	    BIRTH = #{birth},
+	    ADDRESS = #{address},
+	    EMAILID = #{emailId},
+	    EMAILBOX = #{emailBox},
+	    CHILD_AGE = #{childAge},
+	    CARE = #{care},
+	    PAY = #{pay}
+	WHERE USERID = #{userId}
+	</update>
+	
+	<!-- 회원 탈퇴 -->
+	<delete id="delete" parameterType="String">
+	DELETE FROM MEMBER WHERE USERID = #{userId}
+	</delete>
+	
+		
+
+</mapper>
+
+
+
+
+
+
+
+
